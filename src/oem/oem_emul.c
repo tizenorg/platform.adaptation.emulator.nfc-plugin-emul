@@ -3248,7 +3248,7 @@ static bool net_nfc_emul_controller_secure_element_get_atr(net_nfc_target_handle
 	*result = NET_NFC_OK;
 	*atr = NULL;
 
-	strcpy(buffer, "getatr");
+	strncpy(buffer, "getatr", sizeof(buffer));
 
     temp = (data_s *)calloc(1, sizeof(*temp));
     if (temp != NULL) {
@@ -3284,7 +3284,7 @@ static bool net_nfc_emul_controller_secure_element_send_apdu(net_nfc_target_hand
 	*response = NULL;
 
 	//buffer response
-	strcpy(buffer, "response");
+	strncpy(buffer, "response", sizeof(buffer));
 
 	length = strlen(buffer);
 

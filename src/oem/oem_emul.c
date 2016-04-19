@@ -1693,7 +1693,7 @@ static void emul_ReaderThread(void * pArg)
 			condition = 0;
 		}
 
-		while((num_of_files = epoll_wait(emulMsg_poll_fd, emulMsg_poll_events, EPOLL_SIZE, 300)) == 0){
+		while((num_of_files = epoll_wait(emulMsg_poll_fd, emulMsg_poll_events, EPOLL_SIZE, -1)) == 0){
 			if(emulMsg_poll_fd == -1){
 				DEBUG_MSG("client ipc thread is terminated");
 				condition = 0;

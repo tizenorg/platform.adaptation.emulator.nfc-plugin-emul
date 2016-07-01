@@ -1,0 +1,2 @@
+# NFC Emulator Node
+KERNEL=="nfc0", GROUP="network_fw", MODE="0660"

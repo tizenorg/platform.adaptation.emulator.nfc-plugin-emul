@@ -34,6 +34,8 @@ rm -rf %{buildroot}
 
 install -D -m 0644 LICENSE.Apache-2.0  %{buildroot}/%{_datadir}/license/nfc-plugin-emul
 
+mkdir -p %{buildroot}%{_libdir}/udev/rules.d
+cp 98-nfc-plugin-emul.rules %{buildroot}%{_libdir}/udev/rules.d/98-nfc-plugin-emul.rules
 
 %postun -p /sbin/ldconfig
 
@@ -43,4 +45,4 @@ install -D -m 0644 LICENSE.Apache-2.0  %{buildroot}/%{_datadir}/license/nfc-plug
 %defattr(-,root,root,-)
 %{_libdir}/nfc/libnfc-plugin.so
 %{_datadir}/license/nfc-plugin-emul
-
+%{_libdir}/udev/rules.d/98-nfc-plugin-emul.rules

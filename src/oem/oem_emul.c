@@ -1729,7 +1729,7 @@ static void emul_ReaderThread(void * pArg)
 					DEBUG_MSG("message = [%s] ", readbuffer);
 
                     /* remove header */
-					_net_nfc_process_emulMsg(readbuffer + NET_NFC_EMUL_HEADER_LENGTH, readcnt - NET_NFC_EMUL_HEADER_LENGTH);
+					_net_nfc_process_emulMsg((uint8_t *)readbuffer + NET_NFC_EMUL_HEADER_LENGTH, (long int)readcnt - NET_NFC_EMUL_HEADER_LENGTH);
 				}
 				else
 				{
@@ -1864,71 +1864,6 @@ static void _net_nfc_emul_controller_stop_thread (void)
 	pthread_join(gEmulThread, NULL);
 
 	DEBUG_EMUL_END();
-}
-
-static bool _net_nfc_emul_controller_create_interfaceFile (void)
-{
-	char file_name[1024] = { 0, };
-	FILE *fp = NULL;
-	struct stat st;
-	bool retval = false;
-
-	DEBUG_EMUL_BEGIN();
-
-	/* create folder */
-	if (stat(NET_NFC_EMUL_DATA_PATH, &st) != 0){
-		if(mkdir(NET_NFC_EMUL_DATA_PATH, 0777) != 0){
-			DEBUG_MSG("create folder is failed");
-			return false;
-		}
-	}
-	else{
-		DEBUG_MSG("folder is already created");
-	}
-
-	/* create file */
-	snprintf(file_name, sizeof(file_name), "%s/%s", NET_NFC_EMUL_DATA_PATH, NET_NFC_EMUL_MESSAGE_FILE_NAME );
-	SECURE_LOGD("file path : %s", file_name);
-
-	if (stat(file_name, &st) == 0) {
-		DEBUG_MSG("file is already created");
-		return true;
-	}
-
-	if ((fp = fopen(file_name, "w")) != NULL)
-	{
-		struct passwd *pw_root = NULL;
-		struct group *gr_root = NULL;
-
-		fchmod(fileno(fp), 0755);
-
-		pw_root = getpwnam("root");
-		gr_root = getgrnam("root");
-
-		if ((pw_root != NULL) && (gr_root != NULL))
-		{
-			if (fchown(fileno(fp), pw_root->pw_uid, gr_root->gr_gid) < 0)
-			{
-				DEBUG_ERR_MSG("failed to change owner");
-			}
-			else {
-				retval = true;
-			}
-		}
-		else {
-			DEBUG_ERR_MSG("failed to get privilege");
-		}
-
-		fclose(fp);
-
-	}
-	else {
-		DEBUG_ERR_MSG("failed to create file");
-	}
-
-	DEBUG_EMUL_END();
-
-	return retval;
 }
 
 static bool net_nfc_emul_controller_init (net_nfc_error_e* result)
@@ -2431,40 +2366,7 @@ static bool net_nfc_emul_controller_transceive(net_nfc_target_handle_s *handle,
 
 	DEBUG_EMUL_BEGIN();
 
-	if (info->dev_type == NET_NFC_MIFARE_DESFIRE_PICC) {
-		DEBUG_MSG("NET_NFC_MIFARE_DESFIRE_PICC");
-
-		/* check ISO-DEP formatable in DesFire */
-		if (info->trans_data.buffer[0] == (uint8_t)0x90 &&
-			info->trans_data.buffer[1] == (uint8_t)0x60) {
-
-			data_s *temp;
-
-			_net_nfc_util_alloc_mem(temp, sizeof(data_s));
-			if (temp != NULL) {
-				temp->length = 9;
-
-				_net_nfc_util_alloc_mem(temp->buffer, temp->length);
-				if (temp->buffer != NULL) {
-					temp->buffer[7] = (uint8_t)0x91;
-					temp->buffer[8] = (uint8_t)0xAF;
-
-					*data = temp;
-					ret = true;
-				} else {
-					*result = NET_NFC_ALLOC_FAIL;
-					_net_nfc_util_free_mem(temp);
-				}
-			} else {
-				*result = NET_NFC_ALLOC_FAIL;
-			}
-		} else {
-			*result = NET_NFC_NOT_SUPPORTED;
-		}
-
-	} else {
-		*result = NET_NFC_NOT_SUPPORTED;
-	}
+	/* This implementation is not needed on Emulator environment */
 
 	DEBUG_EMUL_END();
 
